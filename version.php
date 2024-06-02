@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022041900;
-$plugin->release   = 2022041900;
+$plugin->version   = 2024052801;
+$plugin->release   = 2024052801;
 $plugin->requires  = 2022041900;
 $plugin->component = 'mod_observation';
 $plugin->maturity = MATURITY_STABLE;

@@ -216,6 +216,7 @@ class observation_manager {
 
         $transaction = $DB->start_delegated_transaction();
 
+        $DB->delete_records('observation_point_responses', ['obs_pt_id' => $obpointid]);
         $DB->delete_records('observation_points', ['id' => $obpointid, 'obs_id' => $observationid]);
 
         // Shuffle those above down.

@@ -90,6 +90,8 @@ class observation_point_test extends advanced_testcase {
      * Tests CRUD operations for observation point with expected data.
      */
     public function test_crud_expected () {
+        global $DB;
+
         $data = self::VALID_DATA;
         $data['obs_id'] = $this->instance->id;
 
@@ -137,6 +139,9 @@ class observation_point_test extends advanced_testcase {
         $this->assertTrue(in_array($editeddata->title, array_column($returndata, 'title')));
         $this->assertFalse(in_array($data['title'], array_column($returndata, 'title')));
 
+        $responses = $DB->get_records('observation_point_responses', ['obs_pt_id' => $returnedpoint->id]);
+        $this->assertCount(1, $responses);
+
         // Delete point.
         \mod_observation\observation_manager::delete_observation_point($this->instance->id, $returnedpoint->id);
 
@@ -144,6 +149,10 @@ class observation_point_test extends advanced_testcase {
         $returndata = \mod_observation\observation_manager::get_observation_points($this->instance->id);
 
         $this->assertEmpty($returndata);
+
+        // Confirm response also deleted.
+        $responses = $DB->get_records('observation_point_responses', ['obs_pt_id' => $returnedpoint->id]);
+        $this->assertCount(0, $responses);
 
         // Cannot access point as no longer exists (throws exception).
         $this->expectException('dml_exception');

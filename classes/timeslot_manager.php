@@ -155,6 +155,7 @@ class timeslot_manager {
             self::send_cancellation_message($observationid, $slotid, $timeslot->observee_id, $actioninguserid);
         }
 
+        $DB->delete_records('observation_notifications', ['timeslot_id' => $slotid]);
         $DB->delete_records('observation_timeslots', ['id' => $slotid, 'obs_id' => $observationid]);
     }
 

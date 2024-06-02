@@ -106,9 +106,29 @@ function observation_update_instance($data): bool {
  * @return bool true
  */
 function observation_delete_instance($id) {
-    global $DB;
+    global $DB, $USER;
 
-    $DB->delete_records('observation', array('id' => $id));
+    if (!$observation = $DB->get_record('observation', ['id' => $id])) {
+        return false;
+    }
+
+    $timeslots = \mod_observation\timeslot_manager::get_time_slots($observation->id);
+    foreach ($timeslots as $timeslot) {
+        \mod_observation\timeslot_manager::delete_time_slot($observation->id, $timeslot->id, $USER->id);
+    }
+
+    $sessions = \mod_observation\session_manager::get_sessions($observation->id);
+    foreach ($sessions as $session) {
+        \mod_observation\session_manager::delete_observation_session($observation->id, $session->id);
+    }
+
+    $points = \mod_observation\observation_manager::get_observation_points($observation->id);
+    foreach ($points as $point) {
+        \mod_observation\observation_manager::delete_observation_point($observation->id, $point->id);
+    }
+
+    $DB->delete_records('observation', ['id' => $observation->id]);
+
     return true;
 }
 
