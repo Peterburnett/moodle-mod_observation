@@ -108,5 +108,31 @@ function xmldb_observation_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021052533, 'observation');
     }
 
+    if ($oldversion < 2024052801) {
+        // Clean up any orphan records.
+        $obssqlwhere = 'obs_id NOT IN (SELECT id FROM {observation})';
+
+        // Time slots.
+        $DB->delete_records_select('observation_timeslots', $obssqlwhere);
+
+        // Notifications.
+        $sqlwhere = 'timeslot_id NOT IN (SELECT id FROM {observation_timeslots})';
+        $DB->delete_records_select('observation_notifications', $sqlwhere);
+
+        // Sessions.
+        $DB->delete_records_select('observation_sessions', $obssqlwhere);
+
+        // Points.
+        $DB->delete_records_select('observation_points', $obssqlwhere);
+
+        // Point responses.
+        $sqlwhere = 'obs_pt_id NOT IN (SELECT id FROM {observation_points})
+                     OR obs_ses_id NOT IN (SELECT id FROM {observation_sessions})';
+        $DB->delete_records_select('observation_point_responses', $sqlwhere);
+
+        // Observation savepoint reached.
+        upgrade_mod_savepoint(true, 2024052801, 'observation');
+    }
+
     return true;
 }

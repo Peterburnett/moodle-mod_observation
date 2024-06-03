@@ -285,4 +285,39 @@ class observation_session_test extends advanced_testcase {
         \mod_observation\session_manager::start_session($obid, $oberid, $this->observee->id);
         \mod_observation\session_manager::start_session($obid, $oberid, $this->observee2->id);
     }
+
+    /**
+     * Tests CRUD operations for observation point with expected data.
+     */
+    public function test_crud_expected() {
+        global $DB;
+
+        // Create session and submit point response.
+        $sessionid = $this->create_session();
+        $response = (object)self::VALID_RESPONSE;
+        \mod_observation\observation_manager::submit_point_response($sessionid, $this->pointid1, $response);
+
+        $responses = $DB->get_records('observation_point_responses', ['obs_pt_id' => $this->pointid1]);
+        $this->assertCount(1, $responses);
+
+        // Delete session and test response is also deleted.
+        \mod_observation\session_manager::delete_observation_session($this->instance->id, $sessionid);
+
+        $responses = $DB->get_records('observation_point_responses', ['obs_pt_id' => $this->pointid1]);
+        $this->assertCount(0, $responses);
+
+        // Create another session and submit point response.
+        $sessionid = $this->create_session();
+        $response = (object)self::VALID_RESPONSE;
+        \mod_observation\observation_manager::submit_point_response($sessionid, $this->pointid1, $response);
+
+        $responses = $DB->get_records('observation_point_responses', ['obs_pt_id' => $this->pointid1]);
+        $this->assertCount(1, $responses);
+
+        // Delete point and test related responses are deleted.
+        \mod_observation\observation_manager::delete_observation_point($this->instance->id, $this->pointid1);
+
+        $responses = $DB->get_records('observation_point_responses', ['obs_pt_id' => $this->pointid1]);
+        $this->assertCount(0, $responses);
+    }
 }

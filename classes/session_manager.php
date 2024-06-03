@@ -303,4 +303,16 @@ class session_manager {
             'finish_time' => time()]);
         return;
     }
+
+    /**
+     * Deletes observation session
+     * @param int $observationid ID of the observation instance
+     * @param int $sessionid ID of the observation session to delete
+     */
+    public static function delete_observation_session(int $observationid, int $sessionid) {
+        global $DB;
+
+        $DB->delete_records('observation_point_responses', ['obs_ses_id' => $sessionid]);
+        $DB->delete_records('observation_sessions', ['id' => $sessionid, 'obs_id' => $observationid]);
+    }
 }

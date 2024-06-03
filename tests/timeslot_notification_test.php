@@ -111,6 +111,19 @@ class timeslot_notification_test extends advanced_testcase {
 
         $notifys = \mod_observation\timeslot_manager::get_users_notifications($this->instance->id, $this->observee->id);
         $this->assertEquals(0, count($notifys));
+
+        // Create a different notification.
+        \mod_observation\timeslot_manager::create_notification($this->instance->id, $this->slot2id, $this->observee2->id,
+            (object) self::NOTIFY_DATA);
+
+        $notifys = \mod_observation\timeslot_manager::get_users_notifications($this->instance->id, $this->observee2->id);
+        $this->assertEquals(1, count($notifys));
+
+        // Delete timeslot 2 and check notification is also deleted.
+        \mod_observation\timeslot_manager::delete_time_slot($this->instance->id, $this->slot2id, $this->observer->id);
+
+        $notifys = \mod_observation\timeslot_manager::get_users_notifications($this->instance->id, $this->observee2->id);
+        $this->assertEquals(0, count($notifys));
     }
 
     /**
