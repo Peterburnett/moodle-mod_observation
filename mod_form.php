@@ -59,6 +59,11 @@ class mod_observation_mod_form extends moodleform_mod {
         // Footer.
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+
+        // Observations don't have a grade to pass setting, so remove this element.
+        if ($mform->elementExists('completionpassgrade')) {
+            $mform->removeElement('completionpassgrade');
+        }
     }
 
     /**
